@@ -8,9 +8,11 @@ import TowerData from "./ITowerData";
 
 import {Observable} from "rxjs";
 import * as Papa from 'papaparse';
+// import * as gpx from "gpxparser";
+// import 'leaflet-gpx';
 
 
-//ICON
+//TOWER ICON
 const towerIcon = L.icon({
   iconUrl: 'assets/signal-tower-icon.svg',
   iconSize: [20, 35], // size of the icon
@@ -18,16 +20,23 @@ const towerIcon = L.icon({
   popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
-
-
 @Injectable({
   providedIn: 'root'
 })
 
-
 export class MarkerService {
-  // points: string = '/assets/data/usa-capitals.geojson';
   points: string = '/assets/data/11.csv';
+// points: string = '/assets/data/13.gpx';
+
+  // setFile(file: File) {
+  //   console.log("File Uploaded",file);
+  // }
+
+  // points: any[] | undefined;
+
+// setPoints(points: any[]) {
+//   this.points = points;
+// }
 
   constructor(
     private http: HttpClient,
@@ -42,11 +51,12 @@ export class MarkerService {
   //   return 20 * (val / maxVal);
   // }
 
- loadTower(mnc: string, mcc: string, lac: string, lcid: string): Observable<any> {
-  const url = `https://opencellid.org/cell/get?key=pk.1ee53d550a26632dcc05d960e5b5b07d&mcc=${mcc}&mnc=${mnc}&lac=${lac}&cellid=${lcid}&format=json`;
-   console.log(url);
-  return this.http.get(url);
-}
+  loadTower(mnc: string, mcc: string, lac: string, lcid: string): Observable<any> {
+    const url = `https://opencellid.org/cell/get?key=pk.1ee53d550a26632dcc05d960e5b5b07d&mcc=${mcc}&mnc=${mnc}&lac=${lac}&cellid=${lcid}&format=json`;
+    console.log(url);
+    return this.http.get(url);
+  }
+
 
   //call this method from MapComponent
   makePointsMarkers(map: L.Map): void {
@@ -65,11 +75,12 @@ export class MarkerService {
         const lac = row.lac_tac_sid;
         const lcid = row.long_cid;
 
+    const marker = L.marker(pointCoords);
 
         marker.on('click', (e) => {
           console.log(e.latlng);
 
-         const pointCoords: L.LatLngExpression = [mLat, mLong];
+          const pointCoords: L.LatLngExpression = [mLat, mLong];
 
           //Remove towers after clicking another point
           this.towerMarkers.forEach(marker => {
@@ -82,8 +93,6 @@ export class MarkerService {
               icon: towerIcon
             });
             towerMarker.addTo(map);
-            // towerMarker.bindPopup(this.popupService.makeTowerPopup(data));
-
             towerMarker.bindPopup(this.popupService.makeTowerPopup(APIdata));
 
             //Remove towers after clicking map
@@ -116,6 +125,96 @@ export class MarkerService {
       }
     });
   }
+
+  //MAKE POINTS FROM GPX
+
+  // makePointsGPX(map: L.Map):void {
+  //   const gpx = '/assets/data/13.gpx';
+  //   new L.GPX(gpx, {
+  //     async: true,
+  //     marker_options: {
+  //       startIconUrl: 'images/pin-icon-start.png',
+  //       endIconUrl: 'images/pin-icon-end.png',
+  //       shadowUrl: 'images/pin-shadow.png'
+  //     }
+  //   }).on('loaded', function(e: any) {
+  //     map.fitBounds(e.target.getBounds());
+  //   }).addTo(map);
+  // }
+
+
+  // makePointsGPX(map: L.Map): void {
+  //   this.http.get(this.points, {responseType: 'text'}).subscribe((gpxData: string) => {
+  //     gpx.parse(gpxData);
+  //
+  //     gpx.gpxData.forEach((track:any) => {
+  //       track.segments.forEach((segment:any) => {
+  //         segment.points.forEach((point:any) => {
+  //           const mLat = point.lat;
+  //           const mLong = point.lon;
+  //           const marker = L.marker([mLat, mLong]);
+  //           marker.addTo(map);
+  //         });
+  //       });
+  //     });
+  //   });
+  // }
+
+
+
+  // marker.on('click', (e) => {
+  //   console.log(e.latlng);
+  //
+  //   const pointCoords: L.LatLngExpression = [mLat, mLong];
+  //
+  //   //Remove towers after clicking another point
+  //   this.towerMarkers.forEach(marker => {
+  //     map.removeLayer(marker);
+  //   });
+  //
+  //
+  //   this.loadTower(mnc, mcc, lac, lcid).subscribe((APIdata: TowerData ) => {
+  //     const towerMarker = L.marker([APIdata.lat, APIdata.lon], {
+  //       icon: towerIcon
+  //     });
+  //     towerMarker.addTo(map);
+  //     towerMarker.bindPopup(this.popupService.makeTowerPopup(APIdata));
+  //
+  //     //Remove towers after clicking map
+  //     this.towerMarkers.push(towerMarker);
+  //
+  //     if (this.polyline) {
+  //       map.removeLayer(this.polyline);
+  //     }
+  //
+  //     const lineCoords: L.LatLngExpression[] = [pointCoords, [APIdata.lat, APIdata.lon]];
+  //     this.polyline = L.polyline(lineCoords, {color: 'black'}).addTo(map);
+  //   });
+  // });
+
+
+  //Remove towers after clicking map
+  // map.on('click', () => {
+  //   this.towerMarkers.forEach(marker => {
+  //     map.removeLayer(marker);
+  //   });
+  //   this.towerMarkers = [];
+  //
+  //   if (this.polyline) {
+  //     map.removeLayer(this.polyline);
+  //     this.polyline = undefined
+  //   }
+  // });
+
+  //       marker.addTo(map);
+  //     }
+  //   });
+  // }
+
+
+
+  // GPX POINTS
+
 
   //call this method from MapComponent
   makeLineMarkers(map: L.Map): void {
@@ -155,7 +254,6 @@ export class MarkerService {
   //     }
   //   });
   // }
-
 
 
 

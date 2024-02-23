@@ -23,12 +23,22 @@
 - [ ] Upload files
 - [ ] Database
 
+---
+Upload file and select type csv or json
+Then it will show the first line and you select lat and long
+csv json 
+kml gpx
+
+seperate function that takes lon and lat and returns a point
+So I can use one function for gpx or csv
+
 Can I get approximate location of a phone using only the cell tower information?
 
 ---
 
 ```angular2html
 npx @angular/cli generate service marker --skip-tests
+ng generate c file-upload
 ```
 
 STANDALONE vs MODULE 

@@ -6,11 +6,11 @@ import {LeafletMouseEvent} from "leaflet";
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
-const shadowUrl = 'assets/marker-shadow.png';
+// const shadowUrl = 'assets/marker-shadow.png';
 const iconDefault = L.icon({
   iconRetinaUrl,
   iconUrl,
-  shadowUrl,
+  // shadowUrl,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -19,7 +19,6 @@ const iconDefault = L.icon({
 });
 L.Marker.prototype.options.icon = iconDefault;
 
-
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -27,6 +26,7 @@ L.Marker.prototype.options.icon = iconDefault;
   templateUrl: './map.component.html',
   styleUrl: './map.component.css',
 })
+
 export class MapComponent implements AfterViewInit {
   private map!: L.Map; // | undefined;
   private states: any; // array or not
@@ -79,32 +79,32 @@ export class MapComponent implements AfterViewInit {
   }
 
 
-  private initStatesLayer() {
-    const stateLayer = L.geoJSON(this.states, {
-      style: (feature) => ({
-        weight: 3,
-        opacity: 0.5,
-        color: '#008f68',
-        fillOpacity: 0.8,
-        fillColor: '#6DB65B'
-      }),
-      onEachFeature: (feature, layer) => (
-        layer.on({
-          mouseover: (e) => (this.highlightFeature(e)),
-          mouseout: (e) => (this.resetFeature(e)),
-        })
-      )
-      // onEachFeature: (feature, layer) => {
-      //   layer.on({
-      //     mouseover: this.highlightFeature,
-      //     mouseout: this.resetFeature
-      //   });
-      // }
-    });
-
-    this.map.addLayer(stateLayer);
-    stateLayer.bringToBack();
-  }
+  // private initStatesLayer() {
+  //   const stateLayer = L.geoJSON(this.states, {
+  //     style: (feature) => ({
+  //       weight: 3,
+  //       opacity: 0.5,
+  //       color: '#008f68',
+  //       fillOpacity: 0.8,
+  //       fillColor: '#6DB65B'
+  //     }),
+  //     onEachFeature: (feature, layer) => (
+  //       layer.on({
+  //         mouseover: (e) => (this.highlightFeature(e)),
+  //         mouseout: (e) => (this.resetFeature(e)),
+  //       })
+  //     )
+  //     // onEachFeature: (feature, layer) => {
+  //     //   layer.on({
+  //     //     mouseover: this.highlightFeature,
+  //     //     mouseout: this.resetFeature
+  //     //   });
+  //     // }
+  //   });
+  //
+  //   this.map.addLayer(stateLayer);
+  //   stateLayer.bringToBack();
+  // }
 
 
 
@@ -113,6 +113,7 @@ export class MapComponent implements AfterViewInit {
     this.markerService.makePointsMarkers(this.map);
     this.markerService.makeLineMarkers(this.map);
 
+    // this.markerService.makePointsGPX(this.map);
 
 
     // this.markerService.makeCapitalCircleMarkers(this.map);
