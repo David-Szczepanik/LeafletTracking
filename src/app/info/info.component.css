@@ -1,0 +1,15 @@
+mat-toolbar {
+  position: fixed;
+  overflow: auto;
+  left: auto;
+  height: 100%; /* This will make the navbar stretch to the bottom of the viewport */
+  width: auto; /* This will make the navbar width adjust to its content */
+  display: flex;
+  flex-direction: column;
+}
+
+#stepper {
+  position: fixed;
+  overflow: auto;
+  margin-left: 60px;
+}

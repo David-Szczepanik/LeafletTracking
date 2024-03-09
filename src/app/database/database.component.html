@@ -1,0 +1,26 @@
+<div class="leftBar">
+  <mat-toolbar color="primary">
+    <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+      <mat-button-toggle value="uploadTab" [checked]="!this.changeTabsService.isDatabaseTabActive" (click)="this.changeTabsService.uploadTab()">
+        <mat-icon>cloud_upload</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="databaseTab" [checked]="this.changeTabsService.isDatabaseTabActive" (click)="this.changeTabsService.databaseTab()">
+        <mat-icon>sd_storage</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </mat-toolbar>
+</div>
+
+
+<section id="stepper">
+
+
+  <h2>Database</h2>
+
+  <!--<button (click)="onSubmit()">Submit</button>-->
+
+
+
+
+
+</section>

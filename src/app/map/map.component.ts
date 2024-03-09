@@ -3,6 +3,8 @@ import * as L from 'leaflet';
 import { MarkerService } from '../marker.service';
 import { ShapeService} from "../shape.service";
 import {LeafletMouseEvent} from "leaflet";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {MatButton} from "@angular/material/button";
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -23,7 +25,10 @@ L.Marker.prototype.options.icon = iconDefault;
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [],
+  imports: [
+    MatSlideToggle,
+    MatButton
+  ],
   templateUrl: './map.component.html',
   styleUrl: './map.component.css',
 })
