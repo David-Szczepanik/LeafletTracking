@@ -9,6 +9,14 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {ChangeTabsService} from "../change-tabs.service";
 import {MarkerService} from "../marker.service";
 import {MapService} from "../map.service";
+import {MatFormField} from "@angular/material/form-field";
+import {MatInput} from "@angular/material/input";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {DataService} from "../data.service";
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {NgIf} from "@angular/common";
+
 
 @Component({
   selector: 'app-file-upload',
@@ -17,17 +25,25 @@ import {MapService} from "../map.service";
   imports: [
     FormsModule,
     MatIcon,
+    MatFormFieldModule,
     MatToolbar,
     MatButtonToggleGroup,
     MatButtonToggle,
     MatButton,
-    MatIconButton
+    MatIconButton,
+    MatFormField,
+    MatInput,
+    MatProgressSpinner,
+    NgIf
   ],
   styleUrls: ['./file-upload.component.css']
 })
 
 
 export class FileUploadComponent {
+  fileName: string = "";
+
+  isLoading = false;
 
   get isFileSelected(): boolean {
     return this.file !== null;
@@ -36,20 +52,29 @@ export class FileUploadComponent {
   file: File | null = null;
   parsedData: any[] = [];
 
-  constructor(private http: HttpClient, protected changeTabsService: ChangeTabsService, private markerService: MarkerService, private mapService: MapService) {
+  constructor(private http: HttpClient,private snackBar: MatSnackBar, protected changeTabsService: ChangeTabsService, private markerService: MarkerService, private mapService: MapService, private dataService: DataService) {
   }
 
-  onFilechange(event: any) {
+ onFilechange(event: any) {
+  if (event.target.files && event.target.files.length) {
     this.file = event.target.files[0];
-  }
+    if (this.file) {
+      this.fileName = this.file.name;
+    }
+
+}}
 
   async upload() {
     if (this.file) {    //check if file is selected
+      this.isLoading = true;
       await this.parseFile(this.file as File);
-      console.log('File Parsed:', this.parsedData)
+      // console.log('File Parsed:', this.parsedData)
 
       this.markerService.makePointsMarkers(this.mapService.map, this.parsedData);
       this.markerService.makeLineMarkers(this.mapService.map, this.parsedData);
+
+      this.isLoading = false;
+      this.dataService.openSnackBar('File parsed', 'Success');
     } else {
       alert("Please select a file first");
     }
@@ -70,6 +95,7 @@ export class FileUploadComponent {
 
 
   async sendData() {
+    this.isLoading = true;
     await this.parseFile(this.file as File);
     const geoJSONData = this.createGeoJSON(this.parsedData);
     console.log('GeoJSON:', geoJSONData)
@@ -77,6 +103,8 @@ export class FileUploadComponent {
       .subscribe({
         next: (response: any) => {
           console.log('Response from server:', response.message);
+          this.isLoading = false;
+          this.dataService.openSnackBar('Data sent to database', 'Success');
         },
         error: (error) => {
           console.error('Error:', error);
@@ -108,17 +136,7 @@ export class FileUploadComponent {
     };
   }
 
-
-  onSubmit() {
-    const date = (document.getElementById('date') as HTMLInputElement).value;
-    fetch(`http://localhost:3000/data?date=${date}`)
-      .then(response => response.json())
-      .then(data => {
-        // Display the data in your HTML
-        // This will depend on how you want to display the data
-      });
-  }
-
-
   protected readonly ChangeTabsService = ChangeTabsService;
+
+
 }

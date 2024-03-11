@@ -1,57 +1,32 @@
 # Leaflet Tracking
 
 ## Technologies
-
 - Angular
 - Leaflet
 - OpenStreetMap
-- MongoDB `plugin`
-
+- MongoDB `PostGIS`
 ---
-
 ## Install
-
-`npm install` <br>
+`npm install`
 
 ## Start
-
 `npm start` `=>` http://localhost:4200 <br>
 -- -
 
 ## TODO
+- [x] Take fileId from db -> count how many and based on that generate lines in tab DATABASE
+- [x] Quickly rotate between tabs - uploadTab/databaseTab
 - [x] Lines are slowing app => render lines after loop is done
 - [ ] Render points after loop
-- [ ] Take fileId from db -> count how many and based on that generate lines in tab DATABASE
--  [ ] Quickly rotate between tabs - uploadTab/databaseTab
-
-- [ ] [Stepper](https://material.angular.io/components/stepper/overview#stepper-vertical) upload file -> 
-
 - [x] Function to send mnc, mmc, lac and cid through API to get location of tower
-- [x] Make a polyline between point and tower
+- [x] Make a black polyline between point and tower
 - [x] Tower ICON
-- [ ] Popup for tower
-- [ ] Range between point and tower
-- [ ] Parse files
-- [ ] Database
-
-- [ ] Upload files, toggle between them
+- [x] Popup for tower
+- [x] Upload files => DB => toggle between them
 
 Can I get approximate location of a phone using only the cell tower information?
 
 ---
-
-```angular2html
-npx @angular/cli generate service marker --skip-tests
-```
-
-STANDALONE vs MODULE
-NgModule-based bootstrap
-Injectable
-
-fetch is more modern API than XMLHttpRequest
-fetch is not producing upload progress events
-
-How to preload data in a resolver
 
 ## Apps
 
@@ -60,9 +35,8 @@ How to preload data in a resolver
 | Net Monitor | csv, json, kml |
 | Cell Signal | csv            |  
 
-Tower Info
 
-1. Upload file -> DB -> Parse -> Map
-2. Parse -> Map -> DB
+1. Upload file -> Parse -> Map / DB
+2. DB -> Parse -> Map
 
 

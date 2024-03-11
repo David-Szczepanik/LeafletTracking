@@ -1,6 +1,19 @@
-
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .file-input {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.file-name {
+  margin-right: 30px;
+}
+#fileInput {
+  margin-left: 30px;
 }
 
 mat-toolbar {

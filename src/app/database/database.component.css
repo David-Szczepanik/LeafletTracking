@@ -16,6 +16,9 @@ mat-icon {
   font-size: 20px;
   top: 20px;
 }
+fileName {
+  margin-right: 30px;
+}
 
 #stepper {
   position: fixed;

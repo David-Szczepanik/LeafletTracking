@@ -18,21 +18,19 @@
 
   <!--<button (click)="onSubmit()">Submit</button>-->
 
-  <div class="container">
-    <div class="row mt-5">
-      <div class="col-md-4">
-        <div class="mb-3">
-          <label for="formFile" class="form-label"></label>
-          <input  (change)="this.onFilechange($event)" class="form-control" type="file" id="formFile" accept=".csv">
-          <button mat-raised-button (click)="this.upload()" type="button" class="btn btn-primary mt-3">Upload</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="file-input">
+  <button mat-raised-button type="button" class="btn btn-primary" (click)="fileInput.click()">Choose File</button>
+  <input class="fileInput" #fileInput style="display:none;" (change)="onFilechange($event)" type="file" id="formFile" accept=".csv">
+  <span class="file-name" style="margin-left: 30px" *ngIf="fileName">{{ this.fileName}}</span>
+  <span class="file-name" style="margin-left: 30px" *ngIf="!fileName">No file chosen</span>
+  <button mat-raised-button (click)="this.upload()" type="button" class="btn btn-primary mt-3">Upload</button>
+</div>
 
 
   <h2>2. Send to Database</h2>
 
-<!--  <button mat-raised-button (click)="this.sendData()" type="button" class="btn btn-primary mt-3">Send to DB</button>-->
+  <div>
   <button mat-raised-button (click)="this.sendData()" type="button" class="btn btn-primary mt-3" [disabled]="!isFileSelected">Send to DB</button>
+  <mat-spinner *ngIf="isLoading" [diameter]="50"></mat-spinner>
+  </div>
 </section>

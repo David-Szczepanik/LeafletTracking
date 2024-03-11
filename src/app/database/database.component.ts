@@ -20,6 +20,8 @@ import {
 import {MatPaginator} from "@angular/material/paginator";
 import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
 import {format, parse} from "date-fns";
+import {MatFormField} from "@angular/material/form-field";
+import {MatInput} from "@angular/material/input";
 
 @Component({
   selector: 'app-database',
@@ -44,6 +46,8 @@ import {format, parse} from "date-fns";
     MatHeaderRowDef,
     MatRadioButton,
     MatRadioGroup,
+    MatFormField,
+    MatInput,
   ],
   templateUrl: './database.component.html',
   styleUrl: './database.component.css'
@@ -70,15 +74,9 @@ export class DatabaseComponent implements OnInit {
       this.markerService.makePointsMarkers(this.mapService.map, response);
       this.markerService.makeLineMarkers(this.mapService.map, response);
 
+      this.dataService.openSnackBar('ID: ' + row.fileid, 'Success');
       // this.markerService.setPoints(JSON.stringify(response));
       // console.log("POINTS:", this.markerService.points);
-
-
-
-
-
-
-
     });
 
 
@@ -116,6 +114,5 @@ export class DatabaseComponent implements OnInit {
     let parsedTime = parse(time, "yyyyMMddHHmmss", new Date());
     return format(parsedTime, 'dd.MM.yyyy HH:mm:ss');
   }
-
 
 }
