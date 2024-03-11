@@ -1,3 +1,6 @@
-<app-info></app-info>
-<app-map></app-map>
-<mat-slide-toggle>Toggle me!</mat-slide-toggle>
+<app-navbar></app-navbar>
+<div class="parent-container">
+  <app-map></app-map>
+  <app-file-upload *ngIf="!(this.changeTabsService.isDatabaseTabActive)"></app-file-upload>
+<app-database *ngIf="this.changeTabsService.isDatabaseTabActive"></app-database>
+</div>

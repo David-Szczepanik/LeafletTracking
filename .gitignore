@@ -6,7 +6,9 @@
 /out-tsc
 /bazel-out
 
+src\backend\node_modules\*
 # Node
+/src/backend/node_modules/*
 /node_modules
 npm-debug.log
 yarn-error.log

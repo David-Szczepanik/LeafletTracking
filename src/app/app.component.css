@@ -1,0 +1,16 @@
+.parent-container {
+  display: flex;
+  height:100%;
+  margin-top: 35px;
+}
+
+app-map {
+  width: 70%;
+  height: auto;
+}
+
+app-info {
+  width: 30%;
+  height: auto;
+}
+

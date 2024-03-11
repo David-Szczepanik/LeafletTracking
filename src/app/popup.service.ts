@@ -14,8 +14,7 @@ export class PopupService {
     return `` +
       `<div>Time: ${ formattedTime }</div>` +
       `<div>Latitude: ${ data.lat }</div>` +
-      `<div>Longitude: ${ data.long }</div>` +
-      `<div>Radio Type: ${ data.net_type}</div>`
+      `<div>Longitude: ${ data.long }</div>`
   }
 
   makeTowerPopup(APIdata: any): string {

@@ -1,0 +1,38 @@
+<div class="leftBar">
+  <mat-toolbar color="primary">
+    <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+      <mat-button-toggle value="uploadTab" [checked]="!this.changeTabsService.isDatabaseTabActive" (click)="this.changeTabsService.uploadTab()">
+        <mat-icon>cloud_upload</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="databaseTab" [checked]="this.changeTabsService.isDatabaseTabActive" (click)="this.changeTabsService.databaseTab()">
+        <mat-icon>sd_storage</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </mat-toolbar>
+</div>
+
+<section id="stepper">
+
+
+  <h2>1. Upload</h2>
+
+  <!--<button (click)="onSubmit()">Submit</button>-->
+
+  <div class="container">
+    <div class="row mt-5">
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="formFile" class="form-label"></label>
+          <input  (change)="this.onFilechange($event)" class="form-control" type="file" id="formFile" accept=".csv">
+          <button mat-raised-button (click)="this.upload()" type="button" class="btn btn-primary mt-3">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <h2>2. Send to Database</h2>
+
+<!--  <button mat-raised-button (click)="this.sendData()" type="button" class="btn btn-primary mt-3">Send to DB</button>-->
+  <button mat-raised-button (click)="this.sendData()" type="button" class="btn btn-primary mt-3" [disabled]="!isFileSelected">Send to DB</button>
+</section>

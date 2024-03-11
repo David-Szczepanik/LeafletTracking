@@ -19,6 +19,12 @@
 -- -
 
 ## TODO
+- [x] Lines are slowing app => render lines after loop is done
+- [ ] Render points after loop
+- [ ] Take fileId from db -> count how many and based on that generate lines in tab DATABASE
+-  [ ] Quickly rotate between tabs - uploadTab/databaseTab
+
+- [ ] [Stepper](https://material.angular.io/components/stepper/overview#stepper-vertical) upload file -> 
 
 - [x] Function to send mnc, mmc, lac and cid through API to get location of tower
 - [x] Make a polyline between point and tower
