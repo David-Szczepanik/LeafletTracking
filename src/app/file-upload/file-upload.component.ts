@@ -1,13 +1,14 @@
 import {Component} from '@angular/core';
 import * as Papa from 'papaparse';
 import {HttpClient} from '@angular/common/http';
-import RowData from "../IRowData";
 import {FormsModule} from "@angular/forms";
 import {MatIcon} from "@angular/material/icon";
 import {MatToolbar} from "@angular/material/toolbar";
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {ChangeTabsService} from "../change-tabs.service";
+import {MarkerService} from "../marker.service";
+import {MapService} from "../map.service";
 
 @Component({
   selector: 'app-file-upload',
@@ -28,42 +29,50 @@ import {ChangeTabsService} from "../change-tabs.service";
 
 export class FileUploadComponent {
 
-  selectedDate: string | undefined;
-
+  get isFileSelected(): boolean {
+    return this.file !== null;
+  }
 
   file: File | null = null;
   parsedData: any[] = [];
 
-  constructor(private http: HttpClient, protected changeTabsService: ChangeTabsService) {
+  constructor(private http: HttpClient, protected changeTabsService: ChangeTabsService, private markerService: MarkerService, private mapService: MapService) {
   }
 
   onFilechange(event: any) {
     this.file = event.target.files[0];
   }
 
-  upload() {
+  async upload() {
     if (this.file) {    //check if file is selected
-      this.parseFile(this.file);
+      await this.parseFile(this.file as File);
+      console.log('File Parsed:', this.parsedData)
+
+      this.markerService.makePointsMarkers(this.mapService.map, this.parsedData);
+      this.markerService.makeLineMarkers(this.mapService.map, this.parsedData);
     } else {
       alert("Please select a file first");
     }
   }
 
 
-  parseFile(file: File) {
-    Papa.parse(file, {
-      complete: (results) => {
-        this.parsedData = results.data;
-        // console.log('File Parsed:', this.parsedData)
-        this.sendData(this.parsedData);
-      },
-      header: true
-    });
+  parseFile(file: File): Promise<void> {
+    return new Promise((resolve) => {
+      Papa.parse(file, {
+        complete: (results) => {
+          this.parsedData = results.data;
+          resolve();
+        },
+        header: true
+      });
+    })
   }
 
 
-  sendData(data: any) {
-    const geoJSONData = this.createGeoJSON(data);
+  async sendData() {
+    await this.parseFile(this.file as File);
+    const geoJSONData = this.createGeoJSON(this.parsedData);
+    console.log('GeoJSON:', geoJSONData)
     this.http.post('http://localhost:3000/data', geoJSONData)
       .subscribe({
         next: (response: any) => {
@@ -80,11 +89,12 @@ export class FileUploadComponent {
     const features = parsedData.map((row: any) => ({
       type: "Feature",
       properties: {
+        fileid: row.fileid,
         sys_time: row.sys_time,
         mcc: row.mcc,
         mnc: row.mnc,
         lac_tac_sid: row.lac_tac_sid,
-        long_cid: row.long_cid
+        long_cid: row.long_cid,
       },
       geometry: {
         type: "Point",

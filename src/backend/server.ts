@@ -29,62 +29,10 @@ const db = pgp({
   }
 });
 
-
-app.get('/date', async (req, res) => {
-  const date = req.query.date;
-  const data = await db.any('SELECT * FROM geojson_data WHERE sys_time = $1', '20240202134223');
-  res.json(data);
-});
-
-
-// app.post('/data', (req: Request, res: Response) => {
-//   const data = req.body;
-//   console.log("Data received");
-//   dataBackend = data;
-//   res.status(200).json({ message: 'Data received' });
-// });
-
-
-// app.get('/dataBackend', (req: Request, res: Response) => {
-//   res.status(200).json(dataBackend);
-//
-// })
-
-
-// app.post('/data', async (req: Request, res: Response) => {
-//   const geojsonData = req.body;
-//
-//   try {
-//     for (const feature of geojsonData.features) {
-//       await db.none('INSERT INTO geojson_data (data, sys_time, mcc, mnc, lac_tac_sid, long_cid) VALUES (ST_GeomFromGeoJSON($1), $2, $3, $4, $5, $6)',
-//         [JSON.stringify(feature.geometry), feature.properties.sys_time, feature.properties.mcc, feature.properties.mnc, feature.properties.lac_tac_sid, feature.properties.long_cid]);
-//     }
-//     res.status(200).json({message: 'GeoJSON data inserted successfully'});
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({message: 'An error occurred while inserting the GeoJSON data'});
-//   }
-// });
-
-
-// app.post('/data', async (req: Request, res: Response) => {
-//   let geojsonData = req.body;
-//
-//   try {
-//     for (const feature of geojsonData.features) {
-//       await db.none('INSERT INTO geojson_data (data, sys_time, mcc, mnc, lac_tac_sid, long_cid) VALUES (ST_GeomFromGeoJSON($1), $2, $3, $4, $5, $6)',
-//         [JSON.stringify(feature.geometry), feature.properties.sys_time, feature.properties.mcc, feature.properties.mnc, feature.properties.lac_tac_sid, feature.properties.long_cid]);
-//     }
-//     res.status(200).json({message: 'GeoJSON data inserted successfully'});
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({message: 'An error occurred while inserting the GeoJSON data'});
-//   }
-// });
-
+// parsed file => DB
 app.post('/data', async (req: Request, res: Response) => {
   const geojsonData = req.body;
-  const fileId = uuidv4();
+  const fileId = uuidv4();  // Must be here, so it doesn't change with each row.
 
   try {
     for (const {geometry, properties} of geojsonData.features) {
@@ -102,14 +50,73 @@ app.post('/data', async (req: Request, res: Response) => {
 });
 
 
-app.get('/dataBackend', async (req: Request, res: Response) => {
+// data based on fileID => /date
+app.get('/date', async (req, res) => {
+  const date = req.query.date;
+  // const data = await db.any('SELECT DISTINCT fileId, sys_time FROM geojson_data');
+  const data = await db.any('SELECT fileId, MIN(sys_time), MAX(sys_time) FROM geojson_data GROUP BY fileId');
+  res.json(data);
+});
+
+
+app.get('/getDataForFile/:fileId', async (req: Request, res: Response) => {
   try {
-    const data = await db.any('SELECT id, fileId, sys_time, mcc, mnc, lac_tac_sid, long_cid, ST_AsGeoJSON(data) as geojson FROM geojson_data');
+    const fileId = req.params.fileId;
+    const data = await db.any('SELECT fileId, id, sys_time, mcc, mnc, lac_tac_sid, long_cid, ST_AsGeoJSON(data) as geojson FROM geojson_data WHERE fileId = $1', [fileId]);
+
     const geojson = {
       type: 'FeatureCollection',
       features: data.map((row: any) => ({
         type: 'Feature',
         properties: {
+          fileId: row.fileId,
+          id: row.id,
+          sys_time: row.sys_time,
+          mcc: row.mcc,
+          mnc: row.mnc,
+          lac_tac_sid: row.lac_tac_sid,
+          long_cid: row.long_cid,
+
+        },
+        geometry: JSON.parse(row.geojson)
+      }))
+    };
+
+
+    const latLongData = convertGeoJSONToLatLong(geojson);
+
+
+    res.status(200).json(latLongData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'An error occurred while retrieving the GeoJSON data'});
+  }
+});
+
+function convertGeoJSONToLatLong(geoJSON: any): any[] {
+  return geoJSON.features.map((feature: any) => {
+    return {
+      sys_time: feature.properties.sys_time,
+      lat: feature.geometry.coordinates[1].toString(),
+      long: feature.geometry.coordinates[0].toString(),
+      mcc: feature.properties.mcc,
+      mnc: feature.properties.mnc,
+      lac_tac_sid: feature.properties.lac_tac_sid,
+      long_cid: feature.properties.long_cid,
+    };
+  });
+}
+
+
+app.get('/dataBackend', async (req: Request, res: Response) => {
+  try {
+    const data = await db.any('SELECT fileId, id, sys_time, mcc, mnc, lac_tac_sid, long_cid, ST_AsGeoJSON(data) as geojson FROM geojson_data');
+    const geojson = {
+      type: 'FeatureCollection',
+      features: data.map((row: any) => ({
+        type: 'Feature',
+        properties: {
+          fileId: row.fileid,
           id: row.id,
           sys_time: row.sys_time,
           mcc: row.mcc,
@@ -126,63 +133,6 @@ app.get('/dataBackend', async (req: Request, res: Response) => {
     res.status(500).json({message: 'An error occurred while retrieving the GeoJSON data'});
   }
 });
-
-
-// app.get('/dataBackend', async (req: Request, res: Response) => {
-//   try {
-//     const data = await db.any('SELECT ST_AsGeoJSON(data) as geojson FROM geojson_data');
-//     const geojson = {
-//       type: 'FeatureCollection',
-//       features: data.map((row: any) => JSON.parse(row.geojson))
-//     };
-//     res.status(200).json(geojson);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'An error occurred while retrieving the GeoJSON data' });
-//   }
-// });
-
-
-// app.get('/dataBackend', async (req: Request, res: Response) => {
-//   try {
-//     const data = await db.any('SELECT id, sys_time, mcc, mnc, lac_tac_sid, long_cid, ST_AsGeoJSON(data) as geojson FROM geojson_data');
-//     const geojson = {
-//       type: 'FeatureCollection',
-//       features: data.map((row: any) => ({
-//         type: 'Feature',
-//         properties: {
-//           id: row.id,
-//           sys_time: row.sys_time,
-//           mcc: row.mcc,
-//           mnc: row.mnc,
-//           lac_tac_sid: row.lac_tac_sid,
-//           long_cid: row.long_cid
-//         },
-//         geometry: JSON.parse(row.geojson)
-//       }))
-//     };
-//     res.status(200).json(geojson);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({message: 'An error occurred while retrieving the GeoJSON data'});
-//   }
-// });
-//
-//
-// app.post('/data', async (req: Request, res: Response) => {
-//   const geojsonData = req.body;
-//
-//   try {
-//     for (const feature of geojsonData) {
-//       await db.none('INSERT INTO geojson_data (data, sys_time, mcc, mnc, lac_tac_sid, long_cid) VALUES (ST_GeomFromGeoJSON($1), $2, $3, $4, $5, $6)',
-//         [JSON.stringify(feature.geometry), feature.properties.sys_time, feature.properties.mcc, feature.properties.mnc, feature.properties.lac_tac_sid, feature.properties.long_cid]);
-//     }
-//     res.status(200).json({message: 'GeoJSON data inserted successfully'});
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({message: 'An error occurred while inserting the GeoJSON data'});
-//   }
-// });
 
 
 app.listen(3000, () => {

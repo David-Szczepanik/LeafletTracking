@@ -19,6 +19,8 @@
 -- -
 
 ## TODO
+- [x] Lines are slowing app => render lines after loop is done
+- [ ] Render points after loop
 - [ ] Take fileId from db -> count how many and based on that generate lines in tab DATABASE
 -  [ ] Quickly rotate between tabs - uploadTab/databaseTab
 

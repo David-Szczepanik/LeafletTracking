@@ -14,6 +14,8 @@ import {FileUploadComponent} from "./file-upload/file-upload.component";
 import {DatabaseComponent} from "./database/database.component";
 import {NgIf} from "@angular/common";
 import {ChangeTabsService} from "./change-tabs.service";
+import {DataService} from "./data.service";
+import {MapService} from "./map.service";
 
 @Component({
   selector: 'app-root',
@@ -25,7 +27,7 @@ import {ChangeTabsService} from "./change-tabs.service";
 export class AppComponent {
   title = 'LeafletTracking';
 
-  constructor( protected changeTabsService: ChangeTabsService) {
+  constructor( protected changeTabsService: ChangeTabsService, private http: HttpClient, private dataService: DataService, private mapService: MapService) {
   }
 
 

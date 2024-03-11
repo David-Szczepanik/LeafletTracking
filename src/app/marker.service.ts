@@ -1,13 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import * as L from 'leaflet';
-import { PopupService} from "./popup.service";
-
+import {PopupService} from "./popup.service";
 import RowData from "./IRowData";
 import TowerData from "./ITowerData";
-
 import {Observable} from "rxjs";
-import * as Papa from 'papaparse';
 
 
 //ICON
@@ -18,45 +15,68 @@ const towerIcon = L.icon({
   popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
-
-
 @Injectable({
   providedIn: 'root'
 })
 
 
 export class MarkerService {
-  // points: string = '/assets/data/usa-capitals.geojson';
-  points: string = '/assets/data/11.csv';
 
   constructor(
     private http: HttpClient,
     private popupService: PopupService
-  ) { }
-
+  ) {
+  }
 
   private towerMarkers: L.Marker[] = [];
   private polyline: L.Polyline | undefined;
 
-  // static scaledRadius(val: number, maxVal: number): number {
-  //   return 20 * (val / maxVal);
+
+  // --- CLEAR MARKERS AND POLYLINES ---
+  clearPolylines(map: L.Map): void {
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Polyline) {
+        map.removeLayer(layer);
+      }
+    });
+  }
+
+  clearMarkers(map: L.Map): void {
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        map.removeLayer(layer);
+      }
+    });
+  }
+
+  // --- /                          / ---
+
+
+  loadTower(mnc: string, mcc: string, lac: string, lcid: string): Observable<any> {
+    const url = `https://opencellid.org/cell/get?key=pk.1ee53d550a26632dcc05d960e5b5b07d&mcc=${mcc}&mnc=${mnc}&lac=${lac}&cellid=${lcid}&format=json`;
+    console.log(url);
+    return this.http.get(url);
+  }
+
+  // setPoints(data: string) {
+  //   this.points = data;
+  //   // console.log(this.points)
   // }
 
- loadTower(mnc: string, mcc: string, lac: string, lcid: string): Observable<any> {
-  const url = `https://opencellid.org/cell/get?key=pk.1ee53d550a26632dcc05d960e5b5b07d&mcc=${mcc}&mnc=${mnc}&lac=${lac}&cellid=${lcid}&format=json`;
-   console.log(url);
-  return this.http.get(url);
-}
-
   //call this method from MapComponent
-  makePointsMarkers(map: L.Map): void {
-    this.http.get(this.points, {responseType: 'text'}).subscribe((csvData: string) => {
-      const parsedData = Papa.parse(csvData, {header: true, dynamicTyping: true}).data;
+  makePointsMarkers(map: L.Map, geoJSON: any): void {
+    this.clearMarkers(map);
 
-      for (const row of parsedData as RowData[]) {
+    // const parsedData = JSON.parse(this.points);
+    // console.log("parsed", parsedData);
+    // console.log("row of parsedData", parsedData[0])
+
+    try {
+      for (const row of geoJSON as RowData[]) {
         const mLat = row.lat;
         const mLong = row.long;
         const marker = L.marker([mLat, mLong]);
+
 
         marker.bindPopup(this.popupService.makePointPopup(row));
 
@@ -65,11 +85,10 @@ export class MarkerService {
         const lac = row.lac_tac_sid;
         const lcid = row.long_cid;
 
-
+        // CLICK ON MARKER
         marker.on('click', (e) => {
-          console.log(e.latlng);
 
-         const pointCoords: L.LatLngExpression = [mLat, mLong];
+          const pointCoords: L.LatLngExpression = [mLat, mLong];
 
           //Remove towers after clicking another point
           this.towerMarkers.forEach(marker => {
@@ -77,7 +96,7 @@ export class MarkerService {
           });
 
 
-          this.loadTower(mnc, mcc, lac, lcid).subscribe((APIdata: TowerData ) => {
+          this.loadTower(mnc, mcc, lac, lcid).subscribe((APIdata: TowerData) => {
             const towerMarker = L.marker([APIdata.lat, APIdata.lon], {
               icon: towerIcon
             });
@@ -97,8 +116,7 @@ export class MarkerService {
             this.polyline = L.polyline(lineCoords, {color: 'black'}).addTo(map);
           });
         });
-
-
+        // CLICK ON MARKER <--
         //Remove towers after clicking map
         map.on('click', () => {
           this.towerMarkers.forEach(marker => {
@@ -114,49 +132,47 @@ export class MarkerService {
 
         marker.addTo(map);
       }
-    });
+    } catch (error) {
+      console.error("Error in makePointsMarkers", error);
+    }
   }
 
-  //call this method from MapComponent
-  makeLineMarkers(map: L.Map): void {
-    this.http.get(this.points, {responseType: 'text'}).subscribe((csvData: string) => {
-      const parsedData = Papa.parse(csvData, {header: true, dynamicTyping: true}).data;
 
+//call this method from MapComponent
+  makeLineMarkers(map: L.Map, geoJSON: any): void {
 
-      const latLongs = [];
-      for (const row of parsedData as RowData[]) {
-        const mLat = row.lat;
-        const mLong = row.long;
-        latLongs.push(L.latLng(mLat, mLong));
-        // const marker = L.marker([mLat, mLong]);
+    this.clearPolylines(map);
 
-        // marker.addTo(map);
+    const latLongs = [];
+    for (const row of geoJSON as RowData[]) {
+      const mLat = row.lat;
+      const mLong = row.long;
+      latLongs.push(L.latLng(mLat, mLong));
+    }
 
-        const polyline = L.polyline(latLongs, {color: 'red'}).addTo(map);
-        map.fitBounds(polyline.getBounds());
-      }
-    });
+    const polyline = L.polyline(latLongs, {color: 'red'});
+    polyline.addTo(map);
+    map.fitBounds(polyline.getBounds());
   }
-
-  // makeCapitalCircleMarkers(map: L.Map): void {
-  //   this.http.get(this.capitals).subscribe((res: any) => {
-  //
-  //     const maxPop = Math.max(...res.features.map((x: any) => x.properties.population), 0);
-  //
-  //     for (const c of res.features) {
-  //       const lon = c.geometry.coordinates[0];
-  //       const lat = c.geometry.coordinates[1];
-  //       const circle = L.circleMarker([lat, lon], {
-  //         radius: MarkerService.scaledRadius(c.properties.population, maxPop)});
-  //
-  //       circle.bindPopup(this.popupService.makeCapitalPopup(c.properties));
-  //
-  //       circle.addTo(map);
-  //     }
-  //   });
-  // }
-
-
-
-
 }
+
+// makeCapitalCircleMarkers(map: L.Map): void {
+//   this.http.get(this.capitals).subscribe((res: any) => {
+//
+//     const maxPop = Math.max(...res.features.map((x: any) => x.properties.population), 0);
+//
+//     for (const c of res.features) {
+//       const lon = c.geometry.coordinates[0];
+//       const lat = c.geometry.coordinates[1];
+//       const circle = L.circleMarker([lat, lon], {
+//         radius: MarkerService.scaledRadius(c.properties.population, maxPop)});
+//
+//       circle.bindPopup(this.popupService.makeCapitalPopup(c.properties));
+//
+//       circle.addTo(map);
+//     }
+//   });
+// }
+
+
+

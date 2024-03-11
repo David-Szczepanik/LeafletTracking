@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -6,8 +7,9 @@ import { Injectable } from '@angular/core';
 export class ChangeTabsService {
   public isDatabaseTabActive: boolean = false;
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
+  // CHANGE TABS
   databaseTab() {
     this.isDatabaseTabActive = true;
     console.log('Database tab active')
@@ -17,4 +19,7 @@ export class ChangeTabsService {
     this.isDatabaseTabActive = false;
     console.log('Upload tab active')
   }
+
+
+
 }

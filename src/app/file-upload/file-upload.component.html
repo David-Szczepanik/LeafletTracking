@@ -33,4 +33,6 @@
 
   <h2>2. Send to Database</h2>
 
+<!--  <button mat-raised-button (click)="this.sendData()" type="button" class="btn btn-primary mt-3">Send to DB</button>-->
+  <button mat-raised-button (click)="this.sendData()" type="button" class="btn btn-primary mt-3" [disabled]="!isFileSelected">Send to DB</button>
 </section>
