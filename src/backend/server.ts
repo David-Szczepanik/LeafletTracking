@@ -186,48 +186,6 @@ app.get('/dataBackend', async (req: Request, res: Response) => {
 
 import sgMail from '@sendgrid/mail';
 
-import {config} from "dotenv";
-
-config({path: './src/backend/sendgrid.env'});
-
-config();
-sgMail.setApiKey('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');
-// console.log("ENV", process.env.SENDGRID_API_KEY);
-
-
-//
-// const msg = {
-//   to: 'davidszczepanik@mail.com',
-//   from: 'davidszczepanik@mail.com', // Use the email address or domain you verified above
-//   subject: 'Sending with Twilio SendGrid is Fun',
-//   text: 'and easy to do anywhere, even with Node.js',
-//   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-// };
-// //ES6
-// sgMail
-//   .send(msg)
-//   .then(() => {
-//   }, error => {
-//     console.error(error as any);
-//
-//     if (error.response) {
-//       console.error((error as any).response.body)
-//     }
-//   });
-// //ES8
-// (async () => {
-//   try {
-//     await sgMail.send(msg);
-//   } catch (error) {
-//     console.error(error as any);
-//
-//     if ((error as any).response) {
-//       console.error((error as any).response.body)
-//     }
-//   }
-// })();
-
-
 
 app.post('/send-email', async (req, res) => {
   const { to, from, subject, text, html } = req.body;
