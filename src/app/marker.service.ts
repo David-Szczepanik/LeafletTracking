@@ -15,6 +15,10 @@ const towerIcon = L.icon({
   popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
+/**
+ * The MarkerService class provides methods to manage markers and polylines on a Leaflet map.
+ * It includes methods to clear markers and polylines, load tower data from an API, and create markers for points and lines.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -22,6 +26,11 @@ const towerIcon = L.icon({
 
 export class MarkerService {
 
+  /**
+   * Constructs a new instance of the MarkerService class.
+   * @param http - The HttpClient used to make HTTP requests.
+   * @param popupService - The PopupService used to create popups for markers.
+   */
   constructor(
     private http: HttpClient,
     private popupService: PopupService
@@ -33,6 +42,10 @@ export class MarkerService {
 
 
   // --- CLEAR MARKERS AND POLYLINES ---
+  /**
+   * Clears all polylines from the map.
+   * @param map - Map to remove polylines from.
+   */
   clearPolylines(map: L.Map): void {
     map.eachLayer((layer) => {
       if (layer instanceof L.Polyline) {
@@ -41,6 +54,10 @@ export class MarkerService {
     });
   }
 
+  /**
+   * Clears all markers from the map.
+   * @param map - Map to remove polylines from.
+   */
   clearMarkers(map: L.Map): void {
     map.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
@@ -49,9 +66,16 @@ export class MarkerService {
     });
   }
 
-  // --- /                          / ---
 
-
+  /**
+   * Fetches tower data from the [OpenCellID API](https://wiki.opencellid.org/wiki/API).
+   * @param mnc - The mobile network code.
+   * @param mcc - The mobile country code.
+   * @param lac - The location area code.
+   * @param lcid - The local cell ID.
+   *
+   * @returns An Observable that will emit the API response.
+   */
   loadTower(mnc: string, mcc: string, lac: string, lcid: string): Observable<any> {
     const url = `https://opencellid.org/cell/get?key=pk.1ee53d550a26632dcc05d960e5b5b07d&mcc=${mcc}&mnc=${mnc}&lac=${lac}&cellid=${lcid}&format=json`;
     console.log(url);
@@ -85,8 +109,13 @@ export class MarkerService {
         const lac = row.lac_tac_sid;
         const lcid = row.long_cid;
 
-        // CLICK ON MARKER
-        marker.on('click', (e) => {
+        /**
+         * Event listener for marker click.
+         * Calls loadTower method to fetch data from the [OpenCellID API](https://wiki.opencellid.org/wiki/API).
+         * Creates new marker on the map at the location specified by the API data.
+         * The new marker is added to the map with a popup containing the API data.
+         */
+        marker.on('click', () => {
 
           const pointCoords: L.LatLngExpression = [mLat, mLong];
 
@@ -155,24 +184,5 @@ export class MarkerService {
     map.fitBounds(polyline.getBounds());
   }
 }
-
-// makeCapitalCircleMarkers(map: L.Map): void {
-//   this.http.get(this.capitals).subscribe((res: any) => {
-//
-//     const maxPop = Math.max(...res.features.map((x: any) => x.properties.population), 0);
-//
-//     for (const c of res.features) {
-//       const lon = c.geometry.coordinates[0];
-//       const lat = c.geometry.coordinates[1];
-//       const circle = L.circleMarker([lat, lon], {
-//         radius: MarkerService.scaledRadius(c.properties.population, maxPop)});
-//
-//       circle.bindPopup(this.popupService.makeCapitalPopup(c.properties));
-//
-//       circle.addTo(map);
-//     }
-//   });
-// }
-
 
 

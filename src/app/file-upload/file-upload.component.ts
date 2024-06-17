@@ -39,12 +39,19 @@ import {NgIf} from "@angular/common";
   styleUrls: ['./file-upload.component.css']
 })
 
-
+/**
+ * Component for handling file uploads.
+ * @component
+ */
 export class FileUploadComponent {
   fileName: string = "";
 
   isLoading = false;
 
+  /**
+   * Checks if a file is selected.
+   * @returns {boolean} True if a file is selected, false otherwise.
+   */
   get isFileSelected(): boolean {
     return this.file !== null;
   }
@@ -52,6 +59,15 @@ export class FileUploadComponent {
   file: File | null = null;
   parsedData: any[] = [];
 
+  /**
+   * Constructor for the FileUploadComponent.
+   * @param {HttpClient} http - The injected HttpClient.
+   * @param {MatSnackBar} snackBar - The injected MatSnackBar.
+   * @param {ChangeTabsService} changeTabsService - The injected ChangeTabsService.
+   * @param {MarkerService} markerService - The injected MarkerService.
+   * @param {MapService} mapService - The injected MapService.
+   * @param {DataService} dataService - The injected DataService.
+   */
   constructor(private http: HttpClient,private snackBar: MatSnackBar, protected changeTabsService: ChangeTabsService, private markerService: MarkerService, private mapService: MapService, private dataService: DataService) {
   }
 

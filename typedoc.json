@@ -1,0 +1,24 @@
+{
+  "entryPoints": [
+    "src/**/*"
+  ],
+  "out": "docs",
+  "tsconfig": "./tsconfig.json",
+  "exclude": [
+    "**/__tests__/**",
+    "**/*.spec.ts"
+  ],
+  "includeVersion": true,
+  "excludePrivate": false,
+  "excludeProtected": false,
+  "excludeExternals": false,
+  "excludeInternal": false,
+  "readme": "none",
+  "name": "Leaflet Tracking",
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": [
+    "@mxssfd/typedoc-theme"
+  ],
+  "theme": "my-theme"
+}
+

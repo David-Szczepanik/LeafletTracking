@@ -1,32 +1,37 @@
 # Leaflet Tracking
 
+## Documentation
+
+[IRowData Interface](interfaces/app_IRowData.default.html) <br>
+[Marker Service](classes/app_marker_service.MarkerService.html) <br>
+[Popup Service](classes/app_popup_service.PopupService.html) <br>
+
+[Load Tower](classes/app_marker_service.MarkerService.html#loadTower) <br>
+
+[File Upload](classes/app_file_upload_file_upload_component.FileUploadComponent.html) <br>
+[Database](classes/app_database_database_component.DatabaseComponent.html) <br>
+
+### Managing data
+
+### Creating markers
+
 ## Technologies
+
 - Angular
 - Leaflet
 - OpenStreetMap
 - MongoDB `PostGIS`
+
 ---
-## Install
+
+## 1. Install
+
 `npm install`
 
-## Start
+## 2. Start
+
 `npm start` `=>` http://localhost:4200 <br>
 -- -
-
-## TODO
-- [x] Take fileId from db -> count how many and based on that generate lines in tab DATABASE
-- [x] Quickly rotate between tabs - uploadTab/databaseTab
-- [x] Lines are slowing app => render lines after loop is done
-- [ ] Render points after loop
-- [x] Function to send mnc, mmc, lac and cid through API to get location of tower
-- [x] Make a black polyline between point and tower
-- [x] Tower ICON
-- [x] Popup for tower
-- [x] Upload files => DB => toggle between them
-
-Can I get approximate location of a phone using only the cell tower information?
-
----
 
 ## Apps
 
@@ -34,7 +39,6 @@ Can I get approximate location of a phone using only the cell tower information?
 |-------------|:---------------| 
 | Net Monitor | csv, json, kml |
 | Cell Signal | csv            |  
-
 
 1. Upload file -> Parse -> Map / DB
 2. DB -> Parse -> Map

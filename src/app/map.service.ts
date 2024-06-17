@@ -25,6 +25,4 @@ export class MapService {
 
     tiles.addTo(this.map);
   }
-
-
 }
