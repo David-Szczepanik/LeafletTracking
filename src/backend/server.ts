@@ -3,7 +3,8 @@ import {v4 as uuidv4} from 'uuid';
 
 const pgp = require('pg-promise')();
 // import cors from 'cors';
-const cors = require('cors');
+import cors from 'cors';
+import axios from 'axios';
 
 /**
  * @type {express.Application}
@@ -183,12 +184,16 @@ app.get('/dataBackend', async (req: Request, res: Response) => {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
+import dotenv from 'dotenv';
 import sgMail from '@sendgrid/mail';
+dotenv.config({ path: './src/backend/.env' });
 
+require('dotenv').config();
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
 app.post('/send-email', async (req, res) => {
-  const { to, from, subject, text, html } = req.body;
+  const {to, from, subject, text, html} = req.body;
 
   const msg = {
     to,
@@ -200,13 +205,34 @@ app.post('/send-email', async (req, res) => {
 
   try {
     await sgMail.send(msg);
-    res.status(200).send({ message: 'Email sent successfully' });
+    res.status(200).send({message: 'Email sent successfully'});
   } catch (error) {
     console.error(error);
     if ((error as any).response) {
       console.error((error as any).response.body);
     }
-    res.status(500).send({ message: 'Failed to send email' });
+    res.status(500).send({message: 'Failed to send email'});
+  }
+});
+
+//----------------------------------------------------------------------------------------------------------------------
+
+app.post("/recaptcha", async (req, res) => {
+  const {token, inputVal} = req.body;
+
+  try {
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=$6LcWbvopAAAAAK1C3255U-yyLzdjj68ce__tnRko&response=${token}`
+    );
+
+    if (response.data.success) {
+      res.send("Human");
+    } else {
+      res.send("Robot");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error verifying reCAPTCHA");
   }
 });
 
