@@ -186,7 +186,8 @@ app.get('/dataBackend', async (req: Request, res: Response) => {
 
 import dotenv from 'dotenv';
 import sgMail from '@sendgrid/mail';
-dotenv.config({ path: './src/backend/.env' });
+
+dotenv.config({path: './src/backend/.env'});
 
 require('dotenv').config();
 
@@ -235,6 +236,14 @@ app.post("/recaptcha", async (req, res) => {
     res.status(500).send("Error verifying reCAPTCHA");
   }
 });
+
+//----------------------------------------------------------------------------------------------------------------------
+
+import path from 'path';
+app.use(express.static(path.join(__dirname, 'docs')));
+app.use('/docs/DSA/html', express.static(path.join(__dirname, '/docs/DSA/html')));
+app.use('/docs/hash/docs', express.static(path.join(__dirname, '/docs/hash/docs')));
+app.use('/docs/leaflet/docs', express.static(path.join(__dirname, '/docs/leaflet/docs')));
 
 
 app.listen(3000, () => {
