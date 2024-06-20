@@ -1,6 +1,9 @@
 import express, {Request, Response} from 'express';
 import {v4 as uuidv4} from 'uuid';
 
+import https from 'https';
+import fs from 'fs';
+
 const pgp = require('pg-promise')();
 // import cors from 'cors';
 import cors from 'cors';
@@ -11,7 +14,7 @@ import axios from 'axios';
  */
 const app = express();
 app.use(cors());
-app.use(express.json({limit: '50mb'}));
+app.use(express.json({limit: '500mb'}));
 
 
 //  LOCALHOST
@@ -240,15 +243,26 @@ app.post("/recaptcha", async (req, res) => {
 //----------------------------------------------------------------------------------------------------------------------
 
 import path from 'path';
+
 app.use(express.static(path.join(__dirname, 'docs')));
 app.use('/docs/DSA/html', express.static(path.join(__dirname, '/docs/DSA/html')));
 app.use('/docs/hash/docs', express.static(path.join(__dirname, '/docs/hash/docs')));
 app.use('/docs/leaflet/docs', express.static(path.join(__dirname, '/docs/leaflet/docs')));
 
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+const sslOptions = {
+  key: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/fullchain.pem')
+};
+
+
+https.createServer(sslOptions, app).listen(3000, () => {
+  console.log('Server is running on port 3000 with HTTPS');
 });
+
+// app.listen(3000, () => {
+//   console.log('Server is running on port 3000');
+// });
 
 
 
