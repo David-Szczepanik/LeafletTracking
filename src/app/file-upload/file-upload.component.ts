@@ -115,7 +115,7 @@ export class FileUploadComponent {
     await this.parseFile(this.file as File);
     const geoJSONData = this.createGeoJSON(this.parsedData);
     console.log('GeoJSON:', geoJSONData)
-    this.http.post('http://localhost:3000/data', geoJSONData)
+    this.http.post('https://szczepanik.cz:3000/data', geoJSONData)
       .subscribe({
         next: (response: any) => {
           console.log('Response from server:', response.message);
