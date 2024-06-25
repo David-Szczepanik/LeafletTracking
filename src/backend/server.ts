@@ -248,6 +248,7 @@ app.use(express.static(path.join(__dirname, 'docs')));
 app.use('/docs/DSA/html', express.static(path.join(__dirname, '/docs/DSA/html')));
 app.use('/docs/hash/docs', express.static(path.join(__dirname, '/docs/hash/docs')));
 app.use('/docs/leaflet/docs', express.static(path.join(__dirname, '/docs/leaflet/docs')));
+app.use('/docs/tetris/docs', express.static(path.join(__dirname, '/docs/tetris/html')));
 
 
 const sslOptions = {
