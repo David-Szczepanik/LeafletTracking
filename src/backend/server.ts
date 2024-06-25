@@ -78,13 +78,6 @@ export const postData = async (req: Request, res: Response) => {
 app.post('/data', postData);
 
 // data based on fileID => /date
-/**
- * This is a comment!!!
- * # This is a comment!!!
- * ## This is a comment 2!!!
- * ## This is a comment 3!!!
- * @module LogoSafeComponent
- */
 export const getDate = async (req: Request, res: Response) => {
   const date = req.query.date;
   // const data = await db.any('SELECT DISTINCT fileId, sys_time FROM geojson_data');
@@ -93,16 +86,6 @@ export const getDate = async (req: Request, res: Response) => {
 };
 
 app.get('/date', getDate);
-
-
-/**
- * Endpoint to retrieve GeoJSON data for a specific file ID.
- * @route GET /getDataForFile/:fileId
- * @group GeoJSON - Operations related to GeoJSON data
- * @param {string} fileId.path.required - The ID of the file
- * @returns {object} 200 - An array of GeoJSON data
- * @returns {Error}  500 - An error message if something goes wrong
- */
 
 app.get('/getDataForFile/:fileId', async (req: Request, res: Response) => {
   try {
@@ -138,12 +121,6 @@ app.get('/getDataForFile/:fileId', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * Converts geoJSON into latitude and longitude coordinates
- * @remarks
- * testing remarks tag
- * @param geoJSON
- */
 function convertGeoJSONToLatLong(geoJSON: any): any[] {
   return geoJSON.features.map((feature: any) => {
     return {
@@ -251,19 +228,123 @@ app.use('/docs/leaflet/docs', express.static(path.join(__dirname, '/docs/leaflet
 app.use('/docs/tetris/docs', express.static(path.join(__dirname, '/docs/tetris/html')));
 
 
-const sslOptions = {
-  key: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/fullchain.pem')
-};
+// const sslOptions = {
+//   key: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/privkey.pem'),
+//   cert: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/fullchain.pem')
+// };
 
 
-https.createServer(sslOptions, app).listen(3000, () => {
-  console.log('Server is running on port 3000 with HTTPS');
+//----------------------------------------------------------------------------------------------------------------------
+
+// https.createServer(sslOptions, app).listen(3000, () => {
+//   console.log('Server is running on port 3000 with HTTPS');
+// });
+//----------------------------------------------------------------------------------------------------------------------
+
+
+import {GoogleAuth} from 'google-auth-library';
+
+import {google, drive_v3} from 'googleapis';
+
+// Load the service account key JSON file.
+const SERVICE_ACCOUNT_KEY_FILE_PATH = 'minezone-ca2497d948d2.json';
+console.log(SERVICE_ACCOUNT_KEY_FILE_PATH);
+
+// Create a new JWT client using the key file
+
+// Create a new JWT client using the key file
+const auth = new GoogleAuth({
+  keyFile: SERVICE_ACCOUNT_KEY_FILE_PATH,
+  scopes: ['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/drive.file'],
 });
 
-// app.listen(3000, () => {
-//   console.log('Server is running on port 3000');
-// });
+// Create a new docs client with the JWT client
+const docs = google.docs({version: 'v1', auth});
+
+
+async function createDoc() {
+  const doc = await docs.documents.create({});
+  console.log(`Created new document: ${doc.data.documentId}`);
+  return doc.data.documentId;
+}
+
+async function insertText(documentId: any, text: any) {
+  try {
+    const requests = [
+      {
+        insertText: {
+          location: {
+            index: 1,
+          },
+          text,
+        },
+      },
+    ];
+
+    await docs.documents.batchUpdate({
+      documentId: documentId,
+      requestBody: {
+        requests,
+      },
+    });
+    console.log(`Inserted "${text}" at the beginning of the document.`);
+  } catch (error) {
+    console.error('Error inserting text:', error);
+    throw error;
+  }
+}
+
+async function shareDocument(documentId: string, email: string) {
+  try {
+    const permission = {
+      type: 'user',
+      role: 'writer',
+      emailAddress: email,
+    };
+
+    const drive: drive_v3.Drive = google.drive({version: 'v3', auth});
+
+    await drive.permissions.create({
+      fileId: documentId,
+      requestBody: permission,
+      fields: 'id',
+    });
+    console.log(`Shared document with email: ${email}`);
+  } catch (error) {
+    console.error('Error sharing document:', error);
+    throw error;
+  }
+}
+
+
+async function main() {
+  try {
+    const documentId = '17VuiB9_0p-AhaJk1pC6y_mfmVyAgPgbkdWwVpjjK7bo';
+    // await insertText(documentId, 'Hello, world!');
+  } catch (error) {
+    console.error('Error in main function:', error);
+  }
+}
+
+
+main();
+
+app.post('/writeToDocument', async (req: Request, res: Response) => {
+  const {text} = req.body;
+  const documentId = '17VuiB9_0p-AhaJk1pC6y_mfmVyAgPgbkdWwVpjjK7bo';
+  try {
+    await insertText(documentId, text);
+    res.status(200).json({message: 'Text inserted successfully'});
+  } catch (error) {
+    console.error('Error inserting text:', error);
+    res.status(500).json({message: 'An error occurred while inserting the text'});
+  }
+});
+
+// Start the Express server
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
 
 
 
