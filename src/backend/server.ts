@@ -228,17 +228,16 @@ app.use('/docs/leaflet/docs', express.static(path.join(__dirname, '/docs/leaflet
 app.use('/docs/tetris/docs', express.static(path.join(__dirname, '/docs/tetris/html')));
 
 
-// const sslOptions = {
-//   key: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/privkey.pem'),
-//   cert: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/fullchain.pem')
-// };
+const sslOptions = {
+  key: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/szczepanik.cz/fullchain.pem')
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-// https.createServer(sslOptions, app).listen(3000, () => {
-//   console.log('Server is running on port 3000 with HTTPS');
-// });
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -342,11 +341,14 @@ app.post('/writeToDocument', async (req: Request, res: Response) => {
 });
 
 // Start the Express server
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+// app.listen(3000, () => {
+//   console.log('Server is running on port 3000');
+// });
+
+
+
+
+https.createServer(sslOptions, app).listen(3000, () => {
+  console.log('Server is running on port 3000 with HTTPS');
 });
-
-
-
-
 
