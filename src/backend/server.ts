@@ -29,11 +29,11 @@ app.use(express.json({limit: '500mb'}));
 //  Render
 /** Tested */
 const db = pgp({
-  host: 'dpg-cpars8m3e1ms739uojkg-a.frankfurt-postgres.render.com',
+  host: 'dpg-cpul9glds78s73dvegi0-a.frankfurt-postgres.render.com',
   port: 5432,
-  database: 'leaflet',
+  database: 'leaflet_tzz5',
   user: 'leaflet_user',
-  password: 'WzvPALzeUowaMa03aGHI6mDKzXmEP9Hb',
+  password: 'PbJGtMcE8DGs480CR7WnIvsJqcfi03mU',
   ssl: {
     rejectUnauthorized: false
   }
